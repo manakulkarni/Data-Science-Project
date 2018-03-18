@@ -1,0 +1,166 @@
+---
+title: "New Test"
+author: "Aditya Wakade"
+date: "2 March 2018"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Import the data into csv from Google drive download
+Find summary of all columns
+
+
+```{r}
+setwd("C:/Users/wakad/Documents/INFX 573/project")
+fomc = read.csv("Prod1.csv")
+summary(fomc)
+```
+We aim to find out factors that affect the final Bill Amount of an order. Based on our findings we aim to optimize values for maximum bill amount.
+
+
+
+
+We find the central tendency of the Bill Amount
+
+```{r}
+hist(fomc$Bill.Amount)
+```
+Mean lies at 966
+
+
+
+Looking at the data, mean ~ 1000 and median is ~ 800, we see that this is a J shaped histogram so the median is biased to the left side of the histogram as the histogram is skewed to right.
+
+Add a column with Bill amount notation greater than mean 966
+Define a new column which holds notation for Metropolitan cities of India
+
+```{r}
+fomc$Billnot <-rep(0, nrow(fomc))
+fomc$Billnot[fomc$Bill.Amount > 966] <-1
+fomc$Citymet <-rep(0, nrow(fomc))
+fomc$Citymet[fomc$City == "Mumbai" | fomc$City == "Bengaluru" | fomc$City == "Delhi" | fomc$City == "Kolkata" | fomc$City == "pune" | fomc$City == "Chennai" | fomc$City == "Hyderabad"] <-1
+```
+
+We use the factors of Category of items, price range of items, State of Delivery, Quantity,
+ City metropolitan For finding how they affect the Bill Amount being above or below 966
+Finding binomial general linear model
+
+```{r}
+mod1 <-glm(Billnot~Category+as.character(pricecateg)+State.of.Delivery  +as.factor(Quantity)+as.factor(Citymet),data=fomc[,!colnames(fomc)%in%c("Bill.Amount")], family="binomial")
+summary(mod1)
+```
+Observations
+
+with *** statistical significance
+
+The log odds of the bill amount being above 966 reduces because of -2.6386 for Dry Fruits
+and -0.99 because of Sweets
+
+others
+
+the log odds of bill being above 966 reduces by -3.49 because of juice and -0.46 because of snacks
+
+Being a metropolitan city weakly affects the bill amount being more than 966 
+
+sPICES WEAKLY indicate bill more than 966
+ 
+ 
+Other observations like Ready to eat being for higher bill have very high standard error
+
+
+We try and find the effect of price points of products on Total bill amount
+
+
+```{r}
+x <- fomc$Price
+plot(fomc$Billnot~x, col="blue")
+fits <-fitted(mod1)
+points(x, fits, pch = 4 , cex=0.3)
+abline(0.5, 0)
+```
+Hence products between 100-200 rs boost the chances of total bill being above 966
+
+
+Next we try to find Quantity measure which is optimal for higher bill amounts
+```{r}
+x <- fomc$Quantity
+plot(fomc$Billnot~x, col="blue")
+fits <-fitted(mod1)
+points(x, fits, pch = 4 , cex=0.3)
+abline(0.5, 0)
+```
+Hence, quantities 8 and 9 closely followed by 7 provide larger probability of the bill being higher than 966
+
+
+We find the error percentage of our logistic model
+
+lowest percentage error
+```{r}
+tab <-table(fomc$Billnot, fits>=0.5)
+(tab[1,2]+tab[2,1])/sum(tab)
+```
+Thats about 5% error
+
+
+We find the AUC metric
+```{r}
+library(AUC)
+y <-factor(fomc$Billnot)
+rr <-roc(fits, y)
+plot(rr)
+auc(rr)
+```
+
+
+
+
+We divide the whole dataset into metropolitan and non metropolitan cities
+
+```{r}
+metrodata = fomc[(fomc$Citymet == 1),]
+nonmetro = fomc[(fomc$Citymet == 0),]
+nrow(metrodata)
+nrow(nonmetro)
+```
+
+
+We check the frequency of categories in metro and non metro. However, since total orders in the two subsets are uneven as seen in the previous tab, we find a normalization ratio which is 4880/1120 = 4.357143
+```{r}
+test = xtabs(~Category+Citymet, fomc)
+test[,2] = test[,2]*4.357143
+test
+```
+Organic foods are peferred by non metro cities  (find other observations)
+
+
+
+
+MOst fequent items in metro
+```{r}
+barplot(table(metrodata$Item))
+text(metrodata$Item, label = levels(droplevels(metrodata$Item.Name)))
+```
+
+Finding frequent 20 items in metro
+
+```{r}
+x = sort(-table(metrodata$Item.Name))
+head(x,20)
+
+```
+
+most frequent items in non metro
+```{r}
+barplot(table(nonmetro$Item))
+text(nonmetro$Item, label = levels(droplevels(nonmetro$Item.Name)))
+```
+
+frequent 20 in non metro
+```{r}
+x = sort(-table(nonmetro$Item.Name))
+head(x,20)
+```
+Find common items between metro and non metro to define overall popular items
