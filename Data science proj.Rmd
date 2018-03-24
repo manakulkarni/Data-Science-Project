@@ -1,9 +1,4 @@
----
-title: "New Test"
-author: "Aditya Wakade"
-date: "2 March 2018"
-output: word_document
----
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
