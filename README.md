@@ -32,6 +32,8 @@ exploratory and predictive analytics on transactional data
 provided to us from the business owners of Flavours of My City
 and on the basis of our analysis we came up with the following
 recommendations:
+
+
 1)Diverting metropolitan customers to online channel.
 2)Improving sales and marketing strategies for juices.
 3)Predicting inventory & maintaining a smart catalogue for
