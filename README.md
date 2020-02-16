@@ -13,6 +13,8 @@ statistical analysis of their data can help find insights which will
 enhance the older business model. We decided to take the data
 that came primarily from four segments: Products, Customers,
 Regions and Web Traffic.
+
+
 Typically e-commerce datasets are proprietary and consequently
 hard to find among publicly available data. This dataset contains
 real world data. We will not only perform our analyses but also
@@ -21,7 +23,9 @@ recommendations for scaling up their business. Our research
 intends to understand trends and patterns between different
 characteristics of their data and develop inferences from them .
 These can help the company improve their supply chain and
-better manage their inventory. This analysis would also give us
+better manage their inventory. 
+
+This analysis would also give us
 an idea of the shopping patterns, on the basis of which, the
 business can derive smarter promotions. We performed
 exploratory and predictive analytics on transactional data
